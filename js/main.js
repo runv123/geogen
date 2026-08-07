@@ -191,6 +191,7 @@ function updateWordbankMixUI() {
     uiElements.wordbankMix.disabled = false;
   }
 }
+window.updateWordbankMixUI = updateWordbankMixUI;
 
 /**
  * 生成名称

@@ -145,6 +145,7 @@ const WordBankUI = {
 
     this.elements.importArea.value = '';
     this.renderUserWords();
+    window.updateWordbankMixUI && window.updateWordbankMixUI();
   },
 
   /**

@@ -89,29 +89,41 @@ const WordBankUI = {
    * 渲染用户字库
    */
   renderUserWords() {
-    const hasWords = WordBankManager.hasCustomWords();
-
-    if (!hasWords) {
-      this.elements.userNote.style.display = 'block';
-      this.elements.userWords.innerHTML = '';
-      return;
-    }
-
-    this.elements.userNote.style.display = 'none';
-    let html = '';
-
-    GeoNameData.allTypes.forEach(type => {
-      const words = WordBankManager.getCustomWords('coastal', type); // 简化展示
-      if (words.length > 0) {
-        html += `<h4 style="margin: 12px 0 8px; color: var(--primary);">${GeoNameData.typeLabels[type]}</h4>`;
-        html += words.map(word =>
-          `<span class="wb-word-chip">${word}</span>`
-        ).join('');
+  const hasWords = WordBankManager.hasCustomWords();
+  if (!hasWords) {
+    this.elements.userNote.style.display = 'block';
+    this.elements.userWords.innerHTML = '';
+    return;
+  }
+  
+  this.elements.userNote.style.display = 'none';
+  let html = '';
+  
+  // 只显示滨海城市的词汇（简化版）
+  const words = WordBankManager.getCustomWords('coastal', 'place');
+  if (words.length > 0) {
+    html += '<h4 style="margin: 12px 0 8px; color: var(--primary);">区域地名</h4>';
+    words.forEach(word => {
+      html += `<span class="wb-word-chip">${word}</span>
+               <button class="delete-btn" data-region="coastal" data-type="place" data-word="${word}" style="margin-left: 4px; background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px;">×</button>`;
+    });
+  }
+  
+  this.elements.userWords.innerHTML = html;
+  
+  // 绑定删除事件
+  this.elements.userWords.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const region = e.target.dataset.region;
+      const type = e.target.dataset.type;
+      const word = e.target.dataset.word;
+      if (confirm(`确定删除「${word}」吗？`)) {
+        WordBankManager.removeWord(region, type, word);
+        this.renderUserWords();
       }
     });
-
-    this.elements.userWords.innerHTML = html;
-  },
+  });
+},
 
   /**
    * 导入词库
@@ -145,6 +157,7 @@ const WordBankUI = {
 
     this.elements.importArea.value = '';
     this.renderUserWords();
+    window.updateWordbankMixUI && window.updateWordbankMixUI();
   },
 
   /**

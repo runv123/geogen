@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>地名生成器 - 夜影行者</title>
+<link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+<main class="app">
+  <!-- 顶部Header -->
+  <header>
+    <div class="brand">
+      <div class="logo">地</div>
+      <div>
+        <h1>地名生成器</h1>
+        <p class="subtitle">支持随机模式与填字模式，生成可信的中文地名、站点和道路名称</p>
+      </div>
+    </div>
+    <div class="mode-bar">
+      <button class="mode-btn" id="btnUpdateLog" title="查看更新日志">📋 更新日志</button>
+      <button class="mode-btn" id="btnDeveloper" title="查看开发者信息">👤 开发者</button>
+      <button class="mode-btn" id="btnColorTheme" title="切换颜色主题">🎨 颜色</button>
+      <button class="mode-btn" id="btnWordBank" title="词库管理">📚 词库</button>
+      <button class="mode-btn active" data-mode="random">🎲 随机模式</button>
+      <button class="mode-btn" data-mode="fill">✏️ 填字模式</button>
+    </div>
+  </header>
+
+  <!-- 主体两栏布局 -->
+  <section class="layout">
+    <!-- 左侧：设置面板 -->
+    <aside class="card settings">
+      <div class="card-title">
+        <h2>生成设置</h2>
+        <span class="small-label">可自由组合</span>
+      </div>
+
+      <!-- 随机模式提示 -->
+      <div class="random-hint show" id="randomHint">
+        随机模式将使用预设的地域风格自动生成名称，无需填写任何文字。
+      </div>
+
+      <!-- 填字模式输入区 -->
+      <div class="fill-section" id="fillSection">
+        <div class="field">
+          <label for="seedInput">基础名称</label>
+          <input type="text" id="seedInput" placeholder="例如：创新路" maxlength="20"/>
+          <div class="fill-hint">输入任意中文词组（如"创新路"），系统将围绕它生成关联名称。⚠️ 仅支持中文输入，英文将被过滤。</div>
+        </div>
+      </div>
+
+      <!-- 词库混合滑块 -->
+      <div class="field" id="wordbankMixField">
+        <label>
+          📚 词库混合
+          <span id="mixLabel">系统字库 100%</span>
+        </label>
+        <div class="range-row">
+          <span class="mix-label">系统</span>
+          <input id="wordbankMix" type="range" min="0" max="100" value="100"/>
+          <span class="mix-label">用户</span>
+          <span class="range-value" id="mixValue">100%</span>
+        </div>
+        <div class="fill-hint">
+          100% = 完全使用系统字库，0% = 完全使用用户导入字库。未导入用户字库时此滑块不可用。
+        </div>
+      </div>
+
+      <!-- 字数控制滑块 -->
+      <div class="field">
+        <label for="charCount">📏 字数控制 <span id="charLabel">3字</span></label>
+        <div class="range-row">
+          <span class="char-label">2字</span>
+          <input id="charCount" type="range" min="2" max="6" value="3"/>
+          <span class="char-label">6字</span>
+          <span class="range-value" id="charValue">3字</span>
+        </div>
+        <div class="fill-hint">控制生成名称的目标字数。例如：3字 = 科创路，4字 = 创新中路</div>
+      </div>
+
+      <!-- 生成类型 -->
+      <div class="field">
+        <label>生成类型</label>
+        <div class="type-grid" id="typeGrid">
+          <span class="chip active" data-type="all">全部类型</span>
+          <span class="chip" data-type="place">区域地名</span>
+          <span class="chip" data-type="metro">地铁站</span>
+          <span class="chip" data-type="bus">公交站</span>
+          <span class="chip" data-type="airport">机场</span>
+          <span class="chip" data-type="hospital">医院</span>
+          <span class="chip" data-type="train">火车站</span>
+          <span class="chip" data-type="highspeed">高铁站</span>
+          <span class="chip" data-type="road">道路</span>
+        </div>
+      </div>
+
+      <!-- 地域气质 -->
+      <div class="field">
+        <label for="region">地域气质</label>
+        <select id="region">
+          <option value="coastal">滨海城市</option>
+          <option value="north">北方城市</option>
+          <option value="south">江南水乡</option>
+          <option value="mountain">山地城市</option>
+          <option value="modern">现代新区</option>
+          <option value="historic">历史古城</option>
+        </select>
+      </div>
+
+      <!-- 命名风格 -->
+      <div class="field">
+        <label for="style">命名风格</label>
+        <select id="style">
+          <option value="natural">自然写实</option>
+          <option value="urban">城市规划感</option>
+          <option value="elegant">简洁雅致</option>
+          <option value="historic">古朴传统</option>
+        </select>
+      </div>
+
+      <!-- 生成数量 -->
+      <div class="field">
+        <label for="count">生成数量</label>
+        <div class="range-row">
+          <input id="count" type="range" min="4" max="24" value="12"/>
+          <span class="range-value" id="countValue">12</span>
+        </div>
+      </div>
+
+      <!-- 关联度 -->
+      <div class="field">
+        <label for="relevance">关联度 <span id="relLabel">80%</span></label>
+        <div class="range-row">
+          <input id="relevance" type="range" min="0" max="100" value="80"/>
+          <span class="range-value" id="relValue">80%</span>
+        </div>
+        <div class="fill-hint">关联度越高，生成的名称越接近您填写的关键词；关联度为零时，所有生成名称与关键词完全不同（仅保留关键词本身）</div>
+      </div>
+
+      <!-- 生成按钮 -->
+      <button class="generate-btn" id="generateBtn">✦ 立即生成名称</button>
+
+      <!-- 提示文字 -->
+      <div class="notice">
+        随机模式使用预设词库组合；填字模式以您输入的关键词为锚点，围绕它衍生出道路、站点等名称。
+        关联度控制生成名称与关键词的相似度。所有名称均为虚构示例。
+      </div>
+    </aside>
+
+    <!-- 右侧：结果展示 -->
+    <section class="card result-card">
+      <div class="result-head">
+        <div>
+          <h2 id="resultTitle">生成结果</h2>
+          <p class="subtitle" id="resultSub">点击左侧按钮开始生成</p>
+        </div>
+        <div class="head-actions">
+          <button class="ghost-btn" id="copyBtn">📋 复制全部</button>
+          <button class="ghost-btn" id="exportBtn">📤 导出</button>
+          <button class="ghost-btn" id="clearBtn">🗑️ 清空</button>
+        </div>
+      </div>
+
+      <!-- 结果列表 -->
+      <div class="results" id="results"></div>
+
+      <!-- 收藏区域 -->
+      <div class="history">
+        <div class="card-title">
+          <h2>📌 已收藏名称</h2>
+          <button class="ghost-btn" id="clearSaved">清空收藏</button>
+        </div>
+        <div class="history-list" id="savedList">
+          <span class="small-label">点击名称右上角的 ☆ 可收藏结果</span>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- 底部Footer -->
+  <footer class="footer">
+    <p>@2026 地名生成器 · 感谢使用地名生成器</p>
+  </footer>
+</main>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">详情</h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- 词库管理弹窗 -->
+<div class="wb-panel" id="wbPanel">
+  <div class="wb-container">
+    <div class="wb-header">
+      <h2>📚 词库管理</h2>
+      <button class="wb-close" id="wbClose">✕</button>
+    </div>
+    <div class="wb-body">
+      <div class="wb-tabs">
+        <button class="wb-tab active" data-tab="system">📖 系统字库</button>
+        <button class="wb-tab" data-tab="user">👤 用户字库</button>
+        <button class="wb-tab" data-tab="import">📥 导入字库</button>
+      </div>
+
+      <!-- 系统字库标签页 -->
+      <div class="wb-content active" id="wbSystemTab">
+        <div class="wb-note">
+          ⚠️ 系统字库为只读内容，不可编辑或删除。如需自定义，请使用「用户字库」功能。
+        </div>
+        <div class="wb-selectors">
+          <select id="wbSystemRegion">
+            <option value="coastal">滨海城市</option>
+            <option value="north">北方城市</option>
+            <option value="south">江南水乡</option>
+            <option value="mountain">山地城市</option>
+            <option value="modern">现代新区</option>
+            <option value="historic">历史古城</option>
+          </select>
+          <select id="wbSystemType">
+            <option value="place">区域地名</option>
+            <option value="metro">地铁站</option>
+            <option value="bus">公交站</option>
+            <option value="airport">机场</option>
+            <option value="hospital">医院</option>
+            <option value="train">火车站</option>
+            <option value="highspeed">高铁站</option>
+            <option value="road">道路</option>
+          </select>
+        </div>
+        <div class="wb-words" id="wbSystemWords"></div>
+      </div>
+
+      <!-- 用户字库标签页 -->
+      <div class="wb-content" id="wbUserTab">
+        <div class="wb-note" id="wbUserNote">
+          暂无用户导入字库。请点击「📥 导入字库」标签页导入自定义词汇。
+        </div>
+        <div class="wb-words" id="wbUserWords"></div>
+      </div>
+
+      <!-- 导入字库标签页 -->
+      <div class="wb-content" id="wbImportTab">
+        <div class="wb-import-instructions">
+          <h3>📥 支持导入格式</h3>
+          <div class="format-list">
+            <div class="format-item">
+              <span class="format-badge">JSON</span>
+              <span class="format-desc">标准JSON格式，结构清晰</span>
+            </div>
+            <div class="format-item">
+              <span class="format-badge">TXT</span>
+              <span class="format-desc">每行一个词，简单快捷</span>
+            </div>
+            <div class="format-item">
+              <span class="format-badge">CSV</span>
+              <span class="format-desc">逗号分隔，表格友好</span>
+            </div>
+          </div>
+          <div class="wb-note warning">
+            ⚠️ 以下规则已生效：
+            <br>1. 仅支持中文词汇，英文词汇将被自动过滤
+            <br>2. 敏感词（国家设施、脏字等）将被自动过滤
+            <br>3. 字数不符合范围的词汇将被忽略
+          </div>
+        </div>
+        <div class="wb-import-form">
+          <label>选择地域类型</label>
+          <select id="wbImportRegion">
+            <option value="coastal">滨海城市</option>
+            <option value="north">北方城市</option>
+            <option value="south">江南水乡</option>
+            <option value="mountain">山地城市</option>
+            <option value="modern">现代新区</option>
+            <option value="historic">历史古城</option>
+          </select>
+          <label>选择名称类型</label>
+          <select id="wbImportType">
+            <option value="place">区域地名</option>
+            <option value="metro">地铁站</option>
+            <option value="bus">公交站</option>
+            <option value="airport">机场</option>
+            <option value="hospital">医院</option>
+            <option value="train">火车站</option>
+            <option value="highspeed">高铁站</option>
+            <option value="road">道路</option>
+          </select>
+          <label>粘贴词库内容</label>
+          <textarea id="wbImportArea" placeholder="请粘贴JSON/TXT/CSV格式的词汇内容..." rows="10"></textarea>
+          <div class="wb-import-actions">
+            <button class="wb-btn wb-btn-primary" id="wbImportBtn">📥 导入词库</button>
+            <button class="wb-btn wb-btn-ghost" id="wbClearImport">🗑️ 清空</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 颜色主题弹窗 -->
+<div class="theme-panel" id="themePanel">
+  <div class="theme-container">
+    <div class="theme-header">
+      <h2>🎨 选择主题</h2>
+      <button class="theme-close" id="themeClose">✕</button>
+    </div>
+    <div class="theme-body">
+      <div class="theme-option active" data-theme="system">
+        <div class="theme-preview theme-preview-system"></div>
+        <div class="theme-info">
+          <h3>系统主题</h3>
+          <p>蓝紫色渐变风格，视觉舒适</p>
+        </div>
+        <button class="theme-apply" data-theme="system">应用</button>
+      </div>
+      <div class="theme-option" data-theme="light">
+        <div class="theme-preview theme-preview-light"></div>
+        <div class="theme-info">
+          <h3>浅色主题</h3>
+          <p>白灰蓝清爽风格，适合白天</p>
+        </div>
+        <button class="theme-apply" data-theme="light">应用</button>
+      </div>
+      <div class="theme-option" data-theme="dark">
+        <div class="theme-preview theme-preview-dark"></div>
+        <div class="theme-info">
+          <h3>深色主题</h3>
+          <p>深灰黑蓝夜用风格，保护视力</p>
+        </div>
+        <button class="theme-apply" data-theme="dark">应用</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 开发者弹窗 -->
+<div class="developer-panel" id="developerPanel">
+  <div class="developer-container">
+    <div class="developer-header">
+      <h2>👤 开发者信息</h2>
+      <button class="developer-close" id="developerClose">✕</button>
+    </div>
+    <div class="developer-body">
+      <div class="developer-card">
+        <div class="developer-icon">🏷️</div>
+        <div class="developer-info">
+          <h3>开发者</h3>
+          <p>夜影行者</p>
+        </div>
+      </div>
+      <div class="developer-card">
+        <div class="developer-icon">📺</div>
+        <div class="developer-info">
+          <h3>B站账号</h3>
+          <p>多睡觉吧勇者</p>
+        </div>
+      </div>
+      <div class="developer-card">
+        <div class="developer-icon">💬</div>
+        <div class="developer-info">
+          <h3>QQ群</h3>
+          <p>585129408</p>
+        </div>
+      </div>
+      <div class="developer-card">
+        <div class="developer-icon">📅</div>
+        <div class="developer-info">
+          <h3>版权</h3>
+          <p>@2026 地名生成器</p>
+        </div>
+      </div>
+      <div class="developer-thanks">
+        <p>🙏 感谢使用地名生成器</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 更新日志弹窗 -->
+<div class="update-panel" id="updatePanel">
+  <div class="update-container">
+    <div class="update-header">
+      <h2>📋 更新日志</h2>
+      <button class="update-close" id="updateClose">✕</button>
+    </div>
+    <div class="update-body" id="updateBody"></div>
+  </div>
+</div>
+
+<!-- 导出弹窗 -->
+<div class="export-panel" id="exportPanel">
+  <div class="export-container">
+    <div class="export-header">
+      <h2>📤 导出数据</h2>
+      <button class="export-close" id="exportClose">✕</button>
+    </div>
+    <div class="export-body">
+      <div class="export-option" id="exportSaved">
+        <div class="export-icon">📋</div>
+        <div class="export-info">
+          <h3>导出收藏</h3>
+          <p>导出已收藏的名称列表</p>
+        </div>
+        <button class="export-apply">导出</button>
+      </div>
+      <div class="export-option" id="exportCurrent">
+        <div class="export-icon">📊</div>
+        <div class="export-info">
+          <h3>导出当前结果</h3>
+          <p>导出本次生成的所有名称</p>
+        </div>
+        <button class="export-apply">导出</button>
+      </div>
+      <div class="export-option" id="exportAll">
+        <div class="export-icon">📤</div>
+        <div class="export-info">
+          <h3>全部导出</h3>
+          <p>导出收藏 + 当前结果</p>
+        </div>
+        <button class="export-apply">导出</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 提示消息容器 -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/generator.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/wordbank-manager.js"></script>
+<script src="js/wordbank-ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

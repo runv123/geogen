@@ -124,23 +124,55 @@ function applySuffixAndLength(name, type, targetChars) {
 }
 
 /**
- * 调整名称字数到目标值
+ * 智能调整名称字数到目标值
  * @param {string} name - 原始名称
  * @param {number} targetChars - 目标字数
  * @returns {string} 调整后的名称
  */
 function adjustLength(name, targetChars) {
   if (name.length === targetChars) return name;
+  
   if (name.length < targetChars) {
-    // 字数不足，添加后缀
-    const extra = ["中", "新", "大", "小", "上", "下", "东", "南", "西", "北"];
+    // 智能扩展策略
+    const expanders = ['中', '新', '大', '小', '上', '下', '东', '南', '西', '北', '前', '后'];
+    const expanders2 = ['路', '街', '道', '园', '区', '港', '谷', '湾', '城', '镇'];
+    
     let result = name;
-    while (result.length < targetChars) {
-      result += randomChoice(extra);
+    
+    // 第一次扩展：加方位词
+    if (result.length < targetChars) {
+      result += randomChoice(expanders);
     }
+    
+    // 第二次扩展：加类型词
+    if (result.length < targetChars) {
+      result += randomChoice(expanders2);
+    }
+    
+    // 第三次扩展：继续加方位词
+    while (result.length < targetChars) {
+      result += randomChoice(expanders);
+    }
+    
     return result.slice(0, targetChars);
   }
-  // 字数超出，截断
+  
+  // 字数超出，智能截断（保留核心部分）
+  if (name.length > targetChars) {
+    // 尝试在适当位置截断
+    const possibleCuts = [
+      name.length - 1,
+      Math.max(2, Math.floor(name.length * 0.7)),
+      Math.max(2, Math.floor(name.length * 0.8))
+    ];
+    
+    for (const cut of possibleCuts) {
+      if (cut <= targetChars) {
+        return name.slice(0, cut);
+      }
+    }
+  }
+  
   return name.slice(0, targetChars);
 }
 

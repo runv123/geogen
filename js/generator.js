@@ -91,6 +91,39 @@ function createName(type, seed, rel, mixRatio, targetChars) {
 }
 
 /**
+ * 应用后缀并调整长度
+ * @param {string} name - 原始名称
+ * @param {string} type - 类型
+ * @param {number} targetChars - 目标字数
+ * @returns {string} 处理后的名称
+ */
+function applySuffixAndLength(name, type, targetChars) {
+  // 检查是否已经包含后缀
+  const suffixPatterns = {
+    metro: ["站"],
+    bus: ["站", "路口", "公交站"],
+    airport: ["机场", "航站楼", "航空港"],
+    hospital: ["医院", "中心", "社区卫生"],
+    train: ["站"],
+    highspeed: ["站"],
+    road: ["路", "大道", "街", "巷"]
+  };
+
+  let result = name;
+  const patterns = suffixPatterns[type] || [];
+
+  // 如果没有后缀，添加一个
+  if (!patterns.some(p => name.includes(p))) {
+    const suffix = randomChoice(GeoNameData.suffixes[type]);
+    result = name + suffix;
+  }
+
+  // 调整字数
+  result = adjustLength(result, targetChars);
+  return result;
+}
+
+/**
  * 智能调整名称字数到目标值
  * @param {string} name - 原始名称
  * @param {number} targetChars - 目标字数

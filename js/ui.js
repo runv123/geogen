@@ -63,6 +63,7 @@ function render() {
   `).join('');
 }
 
+
 /**
  * 渲染收藏列表
  */

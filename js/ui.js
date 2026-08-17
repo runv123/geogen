@@ -43,24 +43,24 @@ const uiElements = {
  */
 function render() {
   if (!generated.length) {
-    uiElements.results.innerHTML = '<div class="empty">点击「立即生成名称」开始生成</div>';
+    uiElements.results.innerHTML = '<div class="empty">🌟 点击「立即生成名称」开始生成 🌟</div>';
     return;
   }
 
   uiElements.results.innerHTML = generated.map((item, idx) => `
-    <article class="name-item" onclick="openModal(${idx})">
+    <article class="name-item ripple" style="--i:${idx}">
       <div class="name-meta">
         <span class="tag">${item.type}</span>
-        <button class="star ${saved.includes(item.name) ? "saved" : ""}"
+        <button class="star ${saved.includes(item.name) ? 'saved' : ''}"
           title="收藏"
           onclick="event.stopPropagation(); toggleSave(${idx})">
-          ${saved.includes(item.name) ? "★" : "☆"}
+          ${saved.includes(item.name) ? '★' : '☆'}
         </button>
       </div>
       <div class="name-text">${item.name}</div>
       <div class="name-desc">${item.desc} · ${item.region}</div>
     </article>
-  `).join("");
+  `).join('');
 }
 
 /**

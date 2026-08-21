@@ -3,55 +3,49 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>地名生成器 - 夜影行者</title>
+<title>真实感地名生成器 - 夜影行者</title>
 <link rel="stylesheet" href="css/styles.css"/>
 </head>
 <body>
 <main class="app">
-  <!-- 顶部Header -->
   <header>
     <div class="brand">
       <div class="logo">地</div>
       <div>
-        <h1>地名生成器</h1>
+        <h1>真实感地名生成器</h1>
         <p class="subtitle">支持随机模式与填字模式，生成可信的中文地名、站点和道路名称</p>
       </div>
     </div>
     <div class="mode-bar">
       <button class="mode-btn" id="btnUpdateLog" title="查看更新日志">📋 更新日志</button>
-      <button class="mode-btn" id="btnHistory" title="查看生成历史">📜 历史</button>
       <button class="mode-btn" id="btnDeveloper" title="查看开发者信息">👤 开发者</button>
       <button class="mode-btn" id="btnColorTheme" title="切换颜色主题">🎨 颜色</button>
       <button class="mode-btn" id="btnWordBank" title="词库管理">📚 词库</button>
+      <button class="mode-btn" id="btnHistory" title="生成历史">📜 历史</button>
       <button class="mode-btn active" data-mode="random">🎲 随机模式</button>
       <button class="mode-btn" data-mode="fill">✏️ 填字模式</button>
     </div>
   </header>
 
-  <!-- 主体两栏布局 -->
   <section class="layout">
-    <!-- 左侧：设置面板 -->
     <aside class="card settings">
       <div class="card-title">
         <h2>生成设置</h2>
         <span class="small-label">可自由组合</span>
       </div>
 
-      <!-- 随机模式提示 -->
       <div class="random-hint show" id="randomHint">
         随机模式将使用预设的地域风格自动生成名称，无需填写任何文字。
       </div>
 
-      <!-- 填字模式输入区 -->
       <div class="fill-section" id="fillSection">
         <div class="field">
           <label for="seedInput">基础名称</label>
           <input type="text" id="seedInput" placeholder="例如：创新路" maxlength="20"/>
-          <div class="fill-hint">输入任意中文词组（如"创新路"），系统将围绕它生成关联名称。⚠️ 仅支持中文输入，英文将被过滤。</div>
+          <div class="fill-hint">输入任意中文词组（如"创新路""青山医院"），系统将围绕它生成关联名称。⚠️ 仅支持中文输入，英文将被过滤。</div>
         </div>
       </div>
 
-      <!-- 词库混合滑块 -->
       <div class="field" id="wordbankMixField">
         <label>
           📚 词库混合
@@ -68,7 +62,6 @@
         </div>
       </div>
 
-      <!-- 字数控制滑块 -->
       <div class="field">
         <label for="charCount">📏 字数控制 <span id="charLabel">3字</span></label>
         <div class="range-row">
@@ -80,7 +73,6 @@
         <div class="fill-hint">控制生成名称的目标字数。例如：3字 = 科创路，4字 = 创新中路</div>
       </div>
 
-      <!-- 生成类型 -->
       <div class="field">
         <label>生成类型</label>
         <div class="type-grid" id="typeGrid">
@@ -96,7 +88,6 @@
         </div>
       </div>
 
-      <!-- 地域气质 -->
       <div class="field">
         <label for="region">地域气质</label>
         <select id="region">
@@ -109,7 +100,6 @@
         </select>
       </div>
 
-      <!-- 命名风格 -->
       <div class="field">
         <label for="style">命名风格</label>
         <select id="style">
@@ -120,7 +110,6 @@
         </select>
       </div>
 
-      <!-- 生成数量 -->
       <div class="field">
         <label for="count">生成数量</label>
         <div class="range-row">
@@ -129,7 +118,6 @@
         </div>
       </div>
 
-      <!-- 关联度 -->
       <div class="field">
         <label for="relevance">关联度 <span id="relLabel">80%</span></label>
         <div class="range-row">
@@ -139,42 +127,38 @@
         <div class="fill-hint">关联度越高，生成的名称越接近您填写的关键词；关联度为零时，所有生成名称与关键词完全不同（仅保留关键词本身）</div>
       </div>
 
-      <!-- 生成按钮 -->
       <button class="generate-btn" id="generateBtn">✦ 立即生成名称</button>
 
-      <!-- 提示文字 -->
       <div class="notice">
         随机模式使用预设词库组合；填字模式以您输入的关键词为锚点，围绕它衍生出道路、站点等名称。
         关联度控制生成名称与关键词的相似度。所有名称均为虚构示例。
       </div>
     </aside>
 
-    <!-- 右侧：结果展示 -->
     <section class="card result-card">
       <div class="result-head">
         <div>
           <h2 id="resultTitle">生成结果</h2>
           <p class="subtitle" id="resultSub">点击左侧按钮开始生成</p>
         </div>
-        <!-- 在 result-head 内的 head-actions 前面添加 -->
-       <div class="stats-bar">
-        <div class="stat-item">
-    <span class="stat-number" id="statToday">0</span>
-    <span class="stat-label">今日生成</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-number" id="statTotal">0</span>
-    <span class="stat-label">总生成</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-number" id="statSaved">0</span>
-    <span class="stat-label">已收藏</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-number" id="statWords">0</span>
-    <span class="stat-label">自定义词</span>
+        <div class="stats-bar">
+          <div class="stat-item">
+            <span class="stat-number" id="statToday">0</span>
+            <span class="stat-label">今日生成</span>
           </div>
-       </div>
+          <div class="stat-item">
+            <span class="stat-number" id="statTotal">0</span>
+            <span class="stat-label">总生成</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="statSaved">0</span>
+            <span class="stat-label">已收藏</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="statWords">0</span>
+            <span class="stat-label">自定义词</span>
+          </div>
+        </div>
         <div class="head-actions">
           <button class="ghost-btn" id="copyBtn">📋 复制全部</button>
           <button class="ghost-btn" id="exportBtn">📤 导出</button>
@@ -182,10 +166,8 @@
         </div>
       </div>
 
-      <!-- 结果列表 -->
       <div class="results" id="results"></div>
 
-      <!-- 收藏区域 -->
       <div class="history">
         <div class="card-title">
           <h2>📌 已收藏名称</h2>
@@ -198,13 +180,11 @@
     </section>
   </section>
 
-  <!-- 底部Footer -->
   <footer class="footer">
     <p>@2026 地名生成器 · 感谢使用地名生成器</p>
   </footer>
 </main>
 
-<!-- 详情弹窗 -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modal">
     <div class="modal-head">
@@ -215,7 +195,6 @@
   </div>
 </div>
 
-<!-- 词库管理弹窗 -->
 <div class="wb-panel" id="wbPanel">
   <div class="wb-container">
     <div class="wb-header">
@@ -229,7 +208,6 @@
         <button class="wb-tab" data-tab="import">📥 导入字库</button>
       </div>
 
-      <!-- 系统字库标签页 -->
       <div class="wb-content active" id="wbSystemTab">
         <div class="wb-note">
           ⚠️ 系统字库为只读内容，不可编辑或删除。如需自定义，请使用「用户字库」功能。
@@ -257,7 +235,6 @@
         <div class="wb-words" id="wbSystemWords"></div>
       </div>
 
-      <!-- 用户字库标签页 -->
       <div class="wb-content" id="wbUserTab">
         <div class="wb-note" id="wbUserNote">
           暂无用户导入字库。请点击「📥 导入字库」标签页导入自定义词汇。
@@ -265,7 +242,6 @@
         <div class="wb-words" id="wbUserWords"></div>
       </div>
 
-      <!-- 导入字库标签页 -->
       <div class="wb-content" id="wbImportTab">
         <div class="wb-import-instructions">
           <h3>📥 支持导入格式</h3>
@@ -323,7 +299,6 @@
   </div>
 </div>
 
-<!-- 颜色主题弹窗 -->
 <div class="theme-panel" id="themePanel">
   <div class="theme-container">
     <div class="theme-header">
@@ -359,7 +334,6 @@
   </div>
 </div>
 
-<!-- 开发者弹窗 -->
 <div class="developer-panel" id="developerPanel">
   <div class="developer-container">
     <div class="developer-header">
@@ -402,7 +376,6 @@
   </div>
 </div>
 
-<!-- 更新日志弹窗 -->
 <div class="update-panel" id="updatePanel">
   <div class="update-container">
     <div class="update-header">
@@ -413,7 +386,6 @@
   </div>
 </div>
 
-<!-- 导出弹窗 -->
 <div class="export-panel" id="exportPanel">
   <div class="export-container">
     <div class="export-header">
@@ -449,7 +421,16 @@
   </div>
 </div>
 
-<!-- 提示消息容器 -->
+<div class="history-panel" id="historyPanel">
+  <div class="history-container">
+    <div class="history-header">
+      <h2>📜 生成历史</h2>
+      <button class="history-close" id="historyClose">✕</button>
+    </div>
+    <div class="history-body" id="historyBody"></div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="js/data.js"></script>

@@ -170,4 +170,6 @@ const GeoNameData = {
       ]
     }
   ]
+    // === 历史记录存储键名 ===
+  historyStorageKey: "place-history"
 };

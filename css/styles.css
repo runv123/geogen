@@ -1146,6 +1146,45 @@ input[type="range"] { flex: 1; accent-color: var(--primary); }
 .toast-error { background: #e53e3e; color: #fff; }
 .toast-info { background: #4169e1; color: #fff; }
 
+/* ====== 数据统计面板 ====== */
+.stats-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  flex: 1;
+  min-width: 70px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0f3ff, #e8edff);
+  border: 1px solid #d0d8f0;
+  text-align: center;
+  transition: .2s;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(65, 105, 225, 0.15);
+}
+
+.stat-number {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
 /* ====== 响应式设计 ====== */
 @media (max-width: 760px) {
   .app { width: min(100% - 22px, 600px); padding-top: 19px; }

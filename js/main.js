@@ -2,6 +2,48 @@
  * 地名生成器 - 主入口和事件绑定
  */
 
+// === 统计数据 ===
+let stats = {
+  totalGenerated: 0,
+  todayGenerated: 0,
+  todayDate: new Date().toDateString()
+};
+
+// 初始化统计数据
+function initStats() {
+  const saved = getStorage("place-stats", {});
+  if (saved.totalGenerated) {
+    stats.totalGenerated = saved.totalGenerated;
+    if (saved.todayDate === new Date().toDateString()) {
+      stats.todayGenerated = saved.todayGenerated || 0;
+    } else {
+      stats.todayGenerated = 0;
+      stats.todayDate = new Date().toDateString();
+    }
+  }
+}
+
+// 更新统计
+function updateStats() {
+  stats.totalGenerated++;
+  stats.todayGenerated++;
+  stats.todayDate = new Date().toDateString();
+  setStorage("place-stats", stats);
+}
+
+// 渲染统计面板
+function renderStats() {
+  const todayEl = document.getElementById('statToday');
+  const totalEl = document.getElementById('statTotal');
+  const savedEl = document.getElementById('statSaved');
+  const wordsEl = document.getElementById('statWords');
+  
+  if (todayEl) todayEl.textContent = stats.todayGenerated;
+  if (totalEl) totalEl.textContent = stats.totalGenerated;
+  if (savedEl) savedEl.textContent = saved.length;
+  if (wordsEl) wordsEl.textContent = WordBankManager.getTotalCustomCount();
+}
+
 // === 当前状态 ===
 let currentType = "all";
 let currentMode = "random";

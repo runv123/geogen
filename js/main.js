@@ -370,7 +370,7 @@ function saveHistory() {
       timestamp: new Date().toISOString(),
       count: generated.length,
       names: generated.map(item => item.name),
-      preview: generated.map(item => item.name).join(', ')
+      preview: generated.slice(0, 3).map(item => item.name).join('、') + (generated.length > 3 ? ` 等${generated.length}个名称` : '')
     };
     
     historyList.unshift(record);
@@ -410,7 +410,8 @@ function openHistoryPanel() {
           return `
             <div class="history-item">
               <span class="history-time">${timeStr}</span>
-              <span class="history-preview">${record.preview}</span>
+              <span class="history-preview">${(record.names || []).slice(0, 3).join('、')}${(record.names || []).length > 3 ? ` 等${record.names.length}个` : ''}</span>
+
               <div class="history-actions">
                 <button class="history-restore-btn" onclick="event.stopPropagation(); restoreHistory(${idx})">📋 恢复</button>
                 <button class="history-delete-btn" onclick="event.stopPropagation(); deleteHistory(${idx})">🗑️</button>

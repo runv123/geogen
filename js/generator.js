@@ -124,57 +124,47 @@ function applySuffixAndLength(name, type, targetChars) {
 }
 
 /**
- * 智能调整名称字数到目标值
+ * 智能调整名称字数（保持词汇完整，不截断后缀）
  * @param {string} name - 原始名称
  * @param {number} targetChars - 目标字数
  * @returns {string} 调整后的名称
  */
 function adjustLength(name, targetChars) {
-  if (name.length === targetChars) return name;
+  // 根据目标字数选择合适的后缀
+  let suffix = "";
+  let baseTarget;
   
-  if (name.length < targetChars) {
-    // 智能扩展策略
-    const expanders = ['中', '新', '大', '小', '上', '下', '东', '南', '西', '北', '前', '后'];
-    const expanders2 = ['路', '街', '道', '园', '区', '港', '谷', '湾', '城', '镇'];
-    
-    let result = name;
-    
-    // 第一次扩展：加方位词
-    if (result.length < targetChars) {
-      result += randomChoice(expanders);
-    }
-    
-    // 第二次扩展：加类型词
-    if (result.length < targetChars) {
-      result += randomChoice(expanders2);
-    }
-    
-    // 第三次扩展：继续加方位词
-    while (result.length < targetChars) {
-      result += randomChoice(expanders);
-    }
-    
-    return result.slice(0, targetChars);
+  if (targetChars <= 3) {
+    // 目标2-3字：用单字后缀
+    const shortSuffixes = ["站", "路", "街", "巷", "园", "湾", "镇"];
+    suffix = randomChoice(shortSuffixes);
+    baseTarget = targetChars - 1;
+  } else if (targetChars <= 4) {
+    // 目标4字：用双字后缀
+    const mediumSuffixes = ["机场", "医院", "大道", "广场", "公园", "路口"];
+    suffix = randomChoice(mediumSuffixes);
+    baseTarget = targetChars - 2;
+  } else {
+    // 目标5-6字：用更长后缀
+    const longSuffixes = ["国际机场", "人民医院", "体育中心", "文化广场"];
+    suffix = randomChoice(longSuffixes);
+    baseTarget = targetChars - suffix.length;
   }
   
-  // 字数超出，智能截断（保留核心部分）
-  if (name.length > targetChars) {
-    // 尝试在适当位置截断
-    const possibleCuts = [
-      name.length - 1,
-      Math.max(2, Math.floor(name.length * 0.7)),
-      Math.max(2, Math.floor(name.length * 0.8))
-    ];
-    
-    for (const cut of possibleCuts) {
-      if (cut <= targetChars) {
-        return name.slice(0, cut);
-      }
+  // 调整基础词长度（不截断后缀）
+  let base = name;
+  if (base.length > baseTarget) {
+    base = base.slice(0, baseTarget);
+  } else if (base.length < baseTarget) {
+    const expanders = ['新', '中', '东', '南', '西', '北', '滨', '云', '清', '锦'];
+    while (base.length < baseTarget) {
+      base += randomChoice(expanders);
     }
   }
   
-  return name.slice(0, targetChars);
+  return base + suffix;
 }
+
 
 /**
  * 构建详情数据

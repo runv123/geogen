@@ -284,20 +284,33 @@ function generate() {
   const rel = Number(uiElements.relevance.value) / 100;
   const mixRatio = Number(uiElements.wordbankMix.value) / 100;
   const targetChars = Number(uiElements.charCount.value);
-  const seed = currentMode === "fill" ? (uiElements.seedInput.value || "") : "";
-  const regionText = uiElements.region.options[uiElements.region.selectedIndex].text;
-
-  // 验证输入
-  if (currentMode === "fill" && seed) {
-    if (containsEnglish(seed)) {
-      showToast('请使用中文输入，英文将被过滤', 'error');
+  
+  // [修改开始]
+  let seed = "";
+  if (currentMode === "fill") {
+    seed = (uiElements.seedInput.value || "").trim();
+    
+    if (!seed) {
+      showToast("请输入基础名称", "error");
+      uiElements.seedInput.focus();
       return;
     }
+    
+    if (containsEnglish(seed)) {
+      showToast("请使用中文输入，英文将被过滤", "error");
+      return;
+    }
+    
     if (containsSensitiveWord(seed)) {
-      showToast('包含敏感词，无法生成', 'error');
+      showToast("包含敏感词，无法生成", "error");
       return;
     }
   }
+  // [修改结束]
+  
+  const regionText = uiElements.region.options[uiElements.region.selectedIndex].text;
+
+  // (后面代码不变)
 
   generated = [];
   const used = new Set();
